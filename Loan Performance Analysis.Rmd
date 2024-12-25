@@ -1,0 +1,437 @@
+---
+title: "Comparative Analysis of Loan Default Rates in Fannie Mae: 2007 vs. 2019"
+author: Ronak Shah
+format: html
+output: bookdown::html_document2
+toc: false
+editor: visual
+---
+
+```{=html}
+<!This block assists in formatting the title, font size, chart caption, etc.– –>
+<style type="text/css">
+  .title {
+    text-align: left;
+}
+body{ /* Normal  */
+      font-size: 16px;
+      margin: 2.5cm;
+      top: 1.5cm;
+      text-align: justify;
+  }
+  .caption {
+    font-size: big;
+    text-align: center;
+    position: above;
+}
+</style>
+```
+```{css plotly-caption, echo = FALSE}
+/*Include this block if you like the chart caption at the top instead of the bottom.*/
+div.figure {
+  display: table;
+}
+div.figure p {
+  display: table-caption;
+  caption-side: top;
+}
+```
+
+------------------------------------------------------------------------
+
+## **Introduction**
+
+Understanding default rates in mortgage loans is vital for financial institutions like Fannie Mae to manage risks effectively. The fourth quarter of 2007 witnessed the onset of the subprime mortgage crisis, resulting in a surge of loan defaults and significant economic fallout. In contrast, the stability observed in the fourth quarter of 2019, before the COVID-19 pandemic, provides an opportunity to contrast with the turbulent times of 2007. By conducting a comparative analysis of default rates during these periods, we aim to uncover insights into historical trends and factors influencing loan defaults, informing future risk management strategies and policy decisions.
+
+## **Objectives:**
+
+**1. Trend of Default Rates:** To assess default rate trends in Fannie Mae-acquired loans during Q4 of 2007 and 2019.
+
+**2. Borrower Credit Score Distribution:** To assess borrower credit score distributions in 2007 and 2019 to understand their impact on loan defaults and identify trends over time.
+
+**3. Loan Purpose and Credit Score Range:** To analyze changes in borrower credit scores and loan purposes between 2007 and 2019 to understand shifts in lending practices.
+
+**4. Borrower Credit Score Range and Original Interest Rate:** To investigate the evolving relationship between borrower credit scores and interest rates over the years 2007 and 2019**.**
+
+**5. Loan Count by Seller:** To identify which sellers have the highest loan counts and understand how the distribution of loan changed from 2007 to 2019.
+
+**6. Geographic Distribution of Defaults:** To analyze the geographic distribution of defaults across different states to understand regional variations in default rates.
+
+## **Findings and Analysis**
+
+**a. Default Rates Over Time**
+
+Figure \@ref(fig:Figure1)
+
+The line chart shows default rate trends for Fannie Mae-acquired loans from 2000 to 2023. A notable increase occurred in 2007, indicative of the housing bubble crisis. Conversely, rates remained stable around 2019, implying improved loan performance. Specifically, defaults peaked in Q4 2007 during the crisis, contrasting with the steadier rates observed in 2019, aligning with Fannie Mae's typical business trend.
+
+**b. Borrower Credit Score Distribution**
+
+Figure \@ref(fig:Figure2)
+
+Analyzing borrower credit scores reveals insights into loan default factors. Figure 2 shows credit score distributions in 2007 and 2019, indicating more outliers in 2007. Over time, median credit scores for both timely payments and defaults increased. Additionally, a notable decrease in borrowers with lower credit scores in 2019 suggests a correlation between creditworthiness and default rates.
+
+**c. Loan Purpose by Credit Score Range**
+
+Figure \@ref(fig:Figure3)
+
+The grouped bar chart depicts credit score breakdowns by loan purpose, showing trends from 2007 to 2019. Cash-Out Refinance dominated in 2007, shifting to Refinance by 2019, reflecting economic and borrower preference changes. Loans were accessible in 2007 with scores below 500, contrasting with 2019's stricter threshold of at least 600, indicating tightened lending standards.
+
+**d. Borrower Credit Score Range and Original Interest Rate**
+
+Figure \@ref(fig:Figure4)
+
+In 2007, borrowers with lower credit scores faced varying interest rates, while in 2019, nearly 25% encountered higher rates. However, as credit scores increased, interest rates notably decreased, with proportions dropping to \<10% and \~2.5%, respectively. This indicates a shift towards more discriminating lending practices favoring higher credit scores, emphasizing the pivotal role of creditworthiness in securing favorable borrowing terms over time.
+
+**e. Loan Count by Seller**
+
+Figure \@ref(fig:Figure5)
+
+The distribution of loan counts shifted significantly from 2007 to 2019, with large institutions dominating pre-crisis, while smaller players gained prominence post-crisis. This decentralization likely resulted from regulatory changes, technological advancements, and shifts in consumer preferences. Overall, it highlights the industry's resilience and adaptability in responding to economic and regulatory changes, emphasizing the importance of agility and innovation to meet evolving consumer needs.
+
+**f. Geographic Distribution of Defaults**
+
+Figure \@ref(fig:Figure6)
+
+The interactive map displays the geographic distribution of defaults across different states in the United States for the years 2007 and 2019. Lighter shades indicate a higher number of defaults in a particular state. From the map, we observe that certain states, such as California and Florida, had higher default rates in both 2007 and 2019. However, the distribution of defaults may have shifted or changed in intensity over the years, reflecting regional variations in economic conditions and housing market dynamics.
+
+## **Conclusion**
+
+The comparative analysis of mortgage industry dynamics between Q4 2007 and Q4 2019 reveals a shift towards stricter lending practices, lower default rates, and a more diverse market structure post-crisis. These insights emphasize the importance of risk management and regulatory oversight for long-term stability. Fannie Mae can use these findings to enhance risk management strategies and lending practices. Overall, the analysis provides valuable insights for stakeholders, guiding strategic decision-making to mitigate default risks and improve loan performance.
+
+Word Count = 795
+
+## Figure Appendix {.unnumbered}
+
+<br>
+
+```{r packages-data, include=FALSE}
+library(tidyverse)
+library(gganimate)
+library(gifski)
+library(knitr)
+library(plotly)
+library(ggplot2)
+library(scales)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+options(warn = -1)
+
+data_2019 = read_rds('data_sample_2019Q4.rds')
+data_2007 = read_rds('data_sample_2007Q4.rds')
+default_rate = read_csv('default_rate_ts.csv')
+view(data_2019)
+view(data_2007)
+view(default_rate)
+```
+
+```{r Figure1, echo = FALSE, fig.width=10, fig.height = 5, fig.cap="Default Rates Over Time"}
+default_rate$Date <- as.Date(default_rate$Date, format = "%m/%d/%Y")
+
+years <- unique(format(default_rate$Date, "%Y"))
+
+
+line_graph <- default_rate %>%
+ggplot(aes(x = Date, y = `Default rate`)) +
+  geom_line(color = "red4", aes(group = 1)) +
+  geom_point(color = "red1") +
+  geom_vline(xintercept = as.Date("2007-10-01"), lty = 2) +
+  labs(x = "Date",
+       y = "Default Rate",
+       caption = "Source: Fannie Mae's Data Portal") +
+  theme_classic() + 
+  theme(axis.text = element_text(face="bold",size=10, colour = "black"),
+        axis.title = element_text(face="bold",size=13),
+        axis.title.x = element_text(margin = margin(t=15)),
+        legend.text = element_text(face="bold",size=10),
+        legend.title = element_text(face="bold",size=10),
+        panel.grid.major.y = element_line(color="grey85"),
+        plot.title = element_text(hjust = 0.5))+
+  scale_x_date(date_breaks = "1 years", date_labels = "%Y", expand = c(0, 0))+
+  geom_text(x = as.Date("2006/01/01"), 
+            y = 0.085, 
+            label = as.Date("2007/10/01"), 
+            size=3.5, 
+            col = 'black', vjust = -1)+
+  scale_y_continuous(breaks = seq(0,0.12,0.020), labels = seq(0,0.12,0.020))+
+  transition_time(year(Date))
+
+line_time_animation <- line_graph +
+  labs(title = "Trend of Default Rate Over Time", subtitle = 'Date: {frame_along}') +
+  transition_reveal(Date) +
+  ease_aes(model = 'linear')
+
+animate(line_time_animation, fps = 5, duration = 20)
+```
+
+<br>
+
+```{r Figure2, echo=FALSE,  fig.width=10, fig.height = 5, fig.cap="Borrower Credit Score Distribution"}
+data_2007$Year <- 2007
+data_2019$Year <- 2019
+
+
+combined_data <- rbind(data_2007, data_2019)
+
+combined_plot <- ggplot(combined_data, aes(x = "", y = CSCORE_B, fill = factor(DEFAULT_FLAG))) +
+  geom_boxplot(alpha = 0.5, color = "black", outlier.fill = NA) +
+  labs(x = "",
+       y = "Borrower Credit Score (CSCORE_B)",
+       fill = "Default Flag") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.ticks = element_blank(),
+        axis.title.x = element_text(face="bold",margin = margin(t = 10)),
+        axis.text = element_text(face="bold",size=9, colour = "black")) +
+  scale_y_continuous(breaks = seq(400, 900, by = 50)) +
+  scale_fill_manual(values = c("grey40", "blue"),
+                    labels = c("Loan Paid on Time", "Loan Defaulted")) +
+  facet_wrap(~Year, ncol = 2)  
+
+print(combined_plot)
+```
+
+<br>
+
+```{r Figure3, echo = FALSE, fig.width=10, fig.height = 5, fig.cap="Loan Purpose by Credit Score Range"}
+data_2007$Credit_Score_Range <- cut(data_2007$CSCORE_B, breaks = c(300, 500, 600, 700, 800, 900), 
+                                    labels = c("300-499", "500-599", "600-699", "700-799", "800-900"))
+
+ggplot(data_2007, aes(x = PURPOSE, fill = Credit_Score_Range)) +
+  geom_bar(position = "dodge") +
+  geom_text(stat='count', aes(label = ..count..),
+            position = position_dodge(width=0.9),
+            vjust = -0.5,
+            size = 3) +
+  labs(title = "2007",
+       x = "Loan Purpose",
+       y = "Count",
+       fill = "Credit Score Range") +
+  theme_classic() +
+  theme(axis.text.x = element_text(hjust = 0.5),
+        axis.title = element_text(size = 12, face = "bold"),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 10, face = "bold"),
+        legend.text = element_text(size = 10))+
+  scale_y_continuous(breaks = seq(0,12000,2000), labels = seq(0,12000,2000))+
+  scale_x_discrete(labels= c("Cash-Out Refinance", "Purchase", "Refinance"))
+```
+
+<br>
+
+```{r, echo = FALSE, fig.width=10, fig.height = 5}
+data_2019$Credit_Score_Range <- cut(data_2019$CSCORE_B, breaks = c(300, 500, 600, 700, 800, 900), 
+                                    labels = c("300-499", "500-599", "600-699", "700-799", "800-900"))
+
+ggplot(data_2019, aes(x = PURPOSE, fill = Credit_Score_Range)) +
+  geom_bar(position = "dodge") +
+  geom_text(stat='count', aes(label = ..count..),
+            position = position_dodge(width=0.9),
+            vjust = -0.5,
+            size = 4) +
+  labs(title = "2019",
+       x = "Loan Purpose",
+       y = "Count",
+       fill = "Credit Score Range") +
+  theme_classic() +
+  theme(axis.text.x = element_text(hjust = 0.5),
+        axis.title = element_text(size = 12, face = "bold"),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 10, face = "bold"),
+        legend.text = element_text(size = 10))+
+  scale_y_continuous(breaks = seq(0,16000,2000), labels = seq(0,16000,2000))+
+  scale_x_discrete(labels= c("Cash-Out Refinance", "Purchase", "Refinance"))
+```
+
+<br>
+
+```{r Figure4, echo = FALSE, fig.width=10, fig.height = 5, fig.cap= "Borrower Credit Score Range and Original Interest Rate"}
+data_2007$Credit_Score_Range <- cut(data_2007$CSCORE_B, 
+                                    breaks = c(500, 600, 700, 800, 900),
+                                    labels = c("500-599", "600-699", "700-799", "800-900"))
+
+data_2007$ORIG_RATE_rounded <- round(data_2007$ORIG_RATE)
+
+filtered_data <- data_2007 %>%
+  filter(CSCORE_B >= 501 & CSCORE_B <= 900)
+
+loan_counts <- filtered_data %>%
+  group_by(Credit_Score_Range, ORIG_RATE_rounded) %>%
+  summarise(loan_count = n(), .groups = "drop")
+
+filtered_loan_counts <- loan_counts %>%
+  filter(ORIG_RATE_rounded %in% c(6, 7, 8))
+
+filtered_loan_counts <- filtered_loan_counts[!is.na(filtered_loan_counts$ORIG_RATE_rounded),]
+
+
+ggplot(loan_counts, aes(x = Credit_Score_Range, y = loan_count, fill = factor(ORIG_RATE_rounded))) +
+  geom_bar(stat = "identity") +
+  labs(title = "2007",
+       x = "Borrower Credit Score Range",
+       y = "Loan Count",
+       fill = "Original Interest Rate") +
+  theme_classic() +
+  theme(axis.text.x = element_text(hjust = 0.5),
+        axis.text = element_text(face="bold",size=9, colour = "black"),
+        axis.title = element_text(size = 14),
+        plot.title = element_text(hjust = 0.5)) +
+  geom_text(data = filtered_loan_counts,
+            aes(label = ifelse(ORIG_RATE_rounded %in% c(6, 7, 8), as.character(loan_count), "")), 
+            position = position_stack(vjust = 0.5), 
+            size = 3, 
+            color = "black", 
+            fontface = "bold")+
+  scale_y_continuous(breaks = seq(0,30000,2000), labels = seq(0,30000,2000))
+```
+
+<br>
+
+```{r, echo = FALSE, fig.width=10, fig.height = 5}
+data_2019$Credit_Score_Range <- cut(data_2019$CSCORE_B, 
+                                    breaks = c(300, 500, 600, 700, 800, 900),
+                                    labels = c("300-499", "500-599", "600-699", "700-799", "800-900"))
+
+data_2019$ORIG_RATE_rounded <- round(data_2019$ORIG_RATE)
+
+filtered_data <- data_2019 %>%
+  filter(CSCORE_B >= 300 & CSCORE_B <= 900)
+
+loan_counts <- filtered_data %>%
+  group_by(Credit_Score_Range, ORIG_RATE_rounded) %>%
+  summarise(loan_count = n(), .groups = "drop")
+
+filtered_loan_counts <- loan_counts %>%
+  filter(ORIG_RATE_rounded %in% c(3, 4, 5))
+
+filtered_loan_counts <- filtered_loan_counts[!is.na(filtered_loan_counts$ORIG_RATE_rounded),]
+
+
+ggplot(loan_counts, aes(x = Credit_Score_Range, y = loan_count, fill = factor(ORIG_RATE_rounded))) +
+  geom_bar(stat = "identity") +
+  labs(title = "2019",
+       x = "Borrower Credit Score Range",
+       y = "Loan Count",
+       fill = "Original Interest Rate") +
+  theme_classic() +
+  theme(axis.text.x = element_text(hjust = 0.5),
+        axis.text = element_text(face="bold",size=9, colour = "black"),
+        axis.title = element_text(size = 14),
+        plot.title = element_text(hjust = 0.5)) +
+  geom_text(data = filtered_loan_counts,
+            aes(label = ifelse(ORIG_RATE_rounded %in% c(3, 4, 5), as.character(loan_count), "")), 
+            position = position_stack(vjust = 0.5), 
+            size = 3, 
+            color = "black", 
+            fontface = "bold")+
+  scale_y_continuous(breaks = seq(0,38000,2000), labels = seq(0,38000,2000))
+
+```
+
+<br>
+
+```{r Figure5,echo = FALSE, fig.width=12, fig.height = 7, fig.cap= "Loan Count by Seller"}
+seller_counts <- data_2007 %>%
+  group_by(SELLER) %>%
+  summarise(count = n(), .groups = "drop") %>%  
+  arrange(desc(count)) %>%
+  mutate(SELLER = factor(SELLER, levels = unique(SELLER))) 
+
+ggplot(seller_counts, aes(x = SELLER, y = count)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  geom_text(aes(label = count), 
+            position = position_stack(0.5), 
+            size = 3, 
+            color = "black") +
+  labs(title = "2007",
+       x = "Seller",
+       y = "Loan Count") +
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title = element_text(size = 12, face = "bold"),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        axis.text = element_text(face="bold",size=9, colour = "black"),
+        axis.title.x = element_text(margin = margin(10)))+
+  scale_y_continuous(breaks = seq(0,22000,2000), labels = seq(0,22000,2000))
+```
+
+<br>
+
+```{r ,echo = FALSE, fig.width=12, fig.height = 7}
+seller_counts <- data_2019 %>%
+  group_by(SELLER) %>%
+  summarise(count = n(), .groups = "drop") %>%  
+  arrange(desc(count)) %>%
+  mutate(SELLER = factor(SELLER, levels = unique(SELLER))) 
+
+ggplot(seller_counts, aes(x = SELLER, y = count)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  geom_text(aes(label = count), 
+            position = position_stack(0.5), 
+            size = 3, 
+            color = "black") +
+  labs(title = "2019",
+       x = "Seller",
+       y = "Loan Count") +
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title = element_text(size = 12, face = "bold"),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        axis.text = element_text(face="bold",size=9, colour = "black"),
+        axis.title.x = element_text(margin = margin(10)))+
+  scale_y_continuous(breaks = seq(0,22000,2000), labels = seq(0,22000,2000))
+```
+
+<br>
+
+```{r Figure6, echo = FALSE, fig.width=10, fig.height = 5, fig.cap="Geographic Distribution of Defaults"}
+default_flag_2007 <- data_2007 %>%
+  group_by(STATE) %>%
+  summarise(count = sum(DEFAULT_FLAG))
+
+default_flag_2019 <- data_2019 %>%
+  group_by(STATE) %>%
+  summarise(count = sum(DEFAULT_FLAG))
+
+combined_data <- full_join(default_flag_2007, default_flag_2019, by = "STATE")
+
+map_2007 <- plot_ly(combined_data, 
+               type = 'choropleth',
+               locations = ~STATE,
+               locationmode = "USA-states",
+               z = ~count.x,
+               text = ~paste("State: ", STATE, "<br>", "Defaults (2007): ", count.x),
+               hoverinfo = "text",
+               color = ~count.x,
+               colorscale = "Greens",
+               colorbar = list(title = 'Default Counts'))
+
+map_2007 <- map_2007 %>% layout(title = '2007',
+                      geo = list(scope = 'usa',
+                                 projection = list(type = 'albers usa')))
+
+map_2019 <- plot_ly(combined_data, 
+               type = 'choropleth',
+               locations = ~STATE,
+               locationmode = "USA-states",
+               z = ~count.y,
+               text = ~paste("State: ", STATE, "<br>", "Defaults (2019): ", count.y),
+               hoverinfo = "text",
+               color = ~count.y,
+               colorscale = "Viridis",
+               colorbar = list(title = 'Default Counts'))
+
+map_2019 <- map_2019 %>% layout(title = '2019',
+                      geo = list(scope = 'usa',
+                                 projection = list(type = 'albers usa')))
+
+
+map_2007
+```
+
+<br>
+
+```{r, echo=FALSE, fig.width=10, fig.height = 5}
+map_2019
+```
+
+<br>
